@@ -19,7 +19,7 @@ void printSearchRange(const vector<int>& v, int l, int r) {
     cout << "Elements in range: [";
     for (int i = l; i < r; i++) {
         cout << v[i];
-        if (i != r - 1) cout << ", ";  // Add comma except after the last element
+        if (i != r - 1) cout << ", ";  
     }
     cout << "]\n";
 }
