@@ -1,3 +1,5 @@
+/* Binary Search Visualizer */
+
 #include <bits/stdc++.h>
 using namespace std;
 
