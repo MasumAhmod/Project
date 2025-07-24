@@ -1,6 +1,7 @@
-/* Binary Search Visualizer */
+/* Binary Search Visualizer with Enhanced Visualization */
 
 #include <bits/stdc++.h>
+#include <thread>
 using namespace std;
 
 #ifdef _WIN32
@@ -9,36 +10,40 @@ using namespace std;
   #define CLEAR "clear"
 #endif
 
-// Function to clear the console screen
+// ANSI color codes for highlighting
+#define RESET   "\033[0m"
+#define BOLDYELLOW "\033[1;33m"
+
+// Clear the console screen
 void clearScreen() {
     system(CLEAR);
 }
 
-// Function to print the current search range along with the elements in the range.
-void printSearchRange(const vector<int>& v, int l, int r) {
-    // Show the current search range and the elements
-    cout << "Current search range: [" << l << ", " << r << "] ";
+// Print the current search range along with elements in range, highlighting the midpoint
+void printSearchRange(const vector<int>& v, int l, int r, int mid) {
+    cout << "Current search range: [" << l << ", " << r << ")\n";
     cout << "Elements in range: [";
     for (int i = l; i < r; i++) {
-        cout << v[i];
-        if (i != r - 1) cout << ", ";  
+        if (i == mid)
+            cout << BOLDYELLOW << v[i] << RESET;
+        else
+            cout << v[i];
+        if (i != r - 1) cout << ", ";
     }
     cout << "]\n";
+    cout << "Midpoint index: " << mid << ", value: " << BOLDYELLOW << v[mid] << RESET << "\n";
+    cout << "---------------------------------------------\n";
 }
 
+// Conditions for binary search variants
 bool isOkStandard(vector<int>& v, int x, int mid) {
-    if (x >= v[mid]) return 0;
-    return 1;
+    return x < v[mid];
 }
-
 bool isOkUpperBound(vector<int>& v, int x, int mid) {
-    if (x >= v[mid]) return 0;
-    return 1;
+    return x < v[mid];
 }
-
 bool isOkLowerBound(vector<int>& v, int x, int mid) {
-    if (x > v[mid]) return 0;
-    return 1;
+    return x <= v[mid];
 }
 
 int main() {
@@ -57,100 +62,71 @@ int main() {
     cin >> key;
 
     int option;
-    cout << "Choose search type (1 for Standard, 2 for Upper Bound, 3 for Lower Bound): ";
+    cout << "Choose search type:\n";
+    cout << "1. Standard Binary Search\n2. Upper Bound\n3. Lower Bound\nChoice: ";
     cin >> option;
 
     int l = 0, r = v.size();
-    int delay = 3000;  // Adjusted delay to 3 seconds (3000 milliseconds)
+    int delay = 2000;
 
-    clearScreen();  // Clear the screen before starting
+    clearScreen(); // Start fresh
 
     switch(option) {
         case 1: {
-            // Standard Binary Search
             while (l < r) {
                 int mid = (l + r) / 2;
-
-                clearScreen();  // Clear the screen before showing the next step
-                printSearchRange(v, l, r);  // Show the current range and elements
-                cout << "Midpoint: v[" << mid << "] = " << v[mid] << "\n";
-                cout << "Checking elements in range: ";
-                for (int i = l; i < r; i++) {
-                    cout << v[i] << " ";
-                }
-                cout << "\n";
-
-                if (isOkStandard(v, key, mid) == 0) {
-                    l = mid + 1;
-                } else {
+                clearScreen();
+                printSearchRange(v, l, r, mid);
+                this_thread::sleep_for(chrono::milliseconds(delay));
+                if (isOkStandard(v, key, mid))
                     r = mid;
-                }
-
-                // Display process step and wait for a moment
-                this_thread::sleep_for(chrono::milliseconds(delay));  // Adjust delay for 3 seconds
+                else
+                    l = mid + 1;
             }
-
-            if (key == v[l - 1]) {
-                cout << "Element found at index " << l << endl;
-            } else {
-                cout << "This value is not present in this list " << endl;
-            }
+            clearScreen();
+            if (l > 0 && v[l - 1] == key)
+                cout << BOLDYELLOW << "Element found at index " << (l - 1) << ", value: " << v[l - 1] << RESET << "\n";
+            else
+                cout << BOLDYELLOW << "Element not found in the array." << RESET << "\n";
             break;
         }
         case 2: {
-            // Upper Bound Search
             while (l < r) {
                 int mid = (l + r) / 2;
-
-                clearScreen();  // Clear the screen before showing the next step
-                printSearchRange(v, l, r);  // Show the current range and elements
-                cout << "Midpoint: v[" << mid << "] = " << v[mid] << "\n";
-                cout << "Checking elements in range: ";
-                for (int i = l; i < r; i++) {
-                    cout << v[i] << " ";
-                }
-                cout << "\n";
-
-                if (isOkUpperBound(v, key, mid) == 0) {
-                    l = mid + 1;
-                } else {
+                clearScreen();
+                printSearchRange(v, l, r, mid);
+                this_thread::sleep_for(chrono::milliseconds(delay));
+                if (isOkUpperBound(v, key, mid))
                     r = mid;
-                }
-
-                // Display process step and wait for a moment
-                this_thread::sleep_for(chrono::milliseconds(delay));  // Adjust delay for 3 seconds
+                else
+                    l = mid + 1;
             }
-            cout << "Upper bound index: " << l + 1 << endl;  // The position of the first element strictly greater than key
+            clearScreen();
+            if (l < v.size())
+                cout << BOLDYELLOW << "Upper bound index: " << l << ", value: " << v[l] << RESET << "\n";
+            else
+                cout << BOLDYELLOW << "Upper bound index: " << l << " (no element greater than key)" << RESET << "\n";
             break;
         }
         case 3: {
-            // Lower Bound Search
             while (l < r) {
                 int mid = (l + r) / 2;
-
-                clearScreen();  // Clear the screen before showing the next step
-                printSearchRange(v, l, r);  // Show the current range and elements
-                cout << "Midpoint: v[" << mid << "] = " << v[mid] << "\n";
-                cout << "Checking elements in range: ";
-                for (int i = l; i < r; i++) {
-                    cout << v[i] << " ";
-                }
-                cout << "\n";
-
-                if (isOkLowerBound(v, key, mid) == 0) {
-                    l = mid + 1;
-                } else {
+                clearScreen();
+                printSearchRange(v, l, r, mid);
+                this_thread::sleep_for(chrono::milliseconds(delay));
+                if (isOkLowerBound(v, key, mid))
                     r = mid;
-                }
-
-                // Display process step and wait for a moment
-                this_thread::sleep_for(chrono::milliseconds(delay));  // Adjust delay for 3 seconds
+                else
+                    l = mid + 1;
             }
-            cout << "Lower bound index: " << l << endl;  // The position of the first element greater than or equal to key
+            clearScreen();
+            if (l < v.size())
+                cout << BOLDYELLOW << "Lower bound index: " << l << ", value: " << v[l] << RESET << "\n";
+            else
+                cout << BOLDYELLOW << "Lower bound index: " << l << " (no element >= key)" << RESET << "\n";
             break;
         }
         default:
-            cout << "Invalid option. Please select 1 for Standard, 2 for Upper Bound, or 3 for Lower Bound." << endl;
-            break;
+            cout << "Invalid option. Choose 1, 2, or 3.\n";
     }
 }
